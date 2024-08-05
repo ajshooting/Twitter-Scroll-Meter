@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function pixelsToMeters(pixels) {
         const dpi = 227 * window.devicePixelRatio; // 96 is the standard DPI for many screens
         const inches = pixels / dpi;
-        const meters = inches * 0.0254; // 1 inch = 0.0254 meters
+        const meters = inches * 0.0254;
         return meters;
     }
 

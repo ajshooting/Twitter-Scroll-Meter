@@ -7,8 +7,8 @@
   function pixelsToMeters(pixels) {
     const ppi = 227 / window.devicePixelRatio // window.devicePixelRatio * 96; // 96 is the standard DPI for many screens
     const inches = pixels / ppi;
-    const meters = inches * 0.0254; // 1 inch = 0.0254 meters
-    console.log("This is 差分！！！！ : " + meters)
+    const meters = inches * 0.0254;
+    console.log("meters : " + meters)
     return meters;
 
   }
