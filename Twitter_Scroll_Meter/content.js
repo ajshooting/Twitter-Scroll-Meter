@@ -10,7 +10,6 @@
     const meters = inches * 0.0254;
     console.log("meters : " + meters)
     return meters;
-
   }
 
   function updateScrollDistance() {
