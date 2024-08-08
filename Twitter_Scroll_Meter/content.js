@@ -1,14 +1,18 @@
+let requestId = null;
+
 (function () {
+  // 1cssピクセルが実際は何物理ピクセルか
   console.log(window.devicePixelRatio)
+
   let scrollDistance = 0;
   let lastPosition = window.scrollY;
 
-  // DPIからピクセルをメートルに変換
+  const ppi = 227
+  // let ppi = 96
+
   function pixelsToMeters(pixels) {
-    const ppi = 227 / window.devicePixelRatio // window.devicePixelRatio * 96; // 96 is the standard DPI for many screens
-    const inches = pixels / ppi;
+    const inches = (pixels * window.devicePixelRatio) / ppi;
     const meters = inches * 0.0254;
-    console.log("meters : " + meters)
     return meters;
   }
 
@@ -20,12 +24,19 @@
     chrome.storage.local.set({ scrollDistance: scrollDistance }, function () {
       console.log(`Scroll distance saved: ${scrollDistance}px (${pixelsToMeters(scrollDistance)} meters)`);
     });
-
-    // メッセージを送信してポップアップを更新
-    chrome.runtime.sendMessage({ scrollDistance: scrollDistance });
+    chrome.runtime.sendMessage({ scrollDistance: scrollDistance })
+      .catch(e => {
+      });
+    requestId = null;
   }
 
-  window.addEventListener('scroll', updateScrollDistance);
+  function handleScroll() {
+    if (!requestId) {
+      requestId = requestAnimationFrame(updateScrollDistance);
+    }
+  }
+
+  window.addEventListener('scroll', handleScroll);
 
   chrome.storage.local.get('scrollDistance', function (data) {
     if (data.scrollDistance) {
