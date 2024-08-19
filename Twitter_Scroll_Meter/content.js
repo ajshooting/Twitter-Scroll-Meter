@@ -19,6 +19,7 @@ function debounce(func, delay) {
   let scrollDistance = 0;
   let lastPosition = window.scrollY;
 
+  // ここはユーザに設定してもらうものとする(default = 96)
   const ppi = 227
   // let ppi = 96
 
@@ -29,7 +30,7 @@ function debounce(func, delay) {
   }
 
   function updateScrollDistance() {
-    const currentPosition = Math.max(document.documentElement.scrollTop, document.body.scrollTop, window.scrollY);
+    const currentPosition = window.scrollY
     const delta = Math.abs(currentPosition - lastPosition);
     scrollDistance += delta;
     lastPosition = currentPosition;
