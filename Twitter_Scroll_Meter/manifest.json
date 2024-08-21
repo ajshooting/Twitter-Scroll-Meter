@@ -7,6 +7,9 @@
         "storage",
         "scripting"
     ],
+    "background": {
+        "service_worker": "background.js"
+    },
     "action": {
         "default_popup": "popup.html"
     },
@@ -18,6 +21,16 @@
             ],
             "js": [
                 "content.js"
+            ]
+        }
+    ],
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "test.html"
+            ],
+            "matches": [
+                "<all_urls>"
             ]
         }
     ]

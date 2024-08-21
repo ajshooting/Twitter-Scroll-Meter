@@ -1,17 +1,10 @@
 const ppi = 227
 // let ppi = 96
 
-// 多分こっちで取得できるの違うよね....みたいな
-
 document.addEventListener('DOMContentLoaded', function () {
-    function pixelsToMeters(pixels) {
-        const inches = (pixels * window.devicePixelRatio) / ppi;
-        const meters = inches * 0.0254;
-        return meters;
-    }
 
     function updateDisplay(scrollDistance) {
-        const meters = pixelsToMeters(scrollDistance).toFixed(2);
+        const meters = scrollDistance.toFixed(2);
         document.getElementById('result').textContent = meters;
     }
 
@@ -20,11 +13,11 @@ document.addEventListener('DOMContentLoaded', function () {
         updateDisplay(scrollDistance);
     });
 
+    // 受け取る、メートルで来るはず
     chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         if (request.scrollDistance !== undefined) {
             updateDisplay(request.scrollDistance);
         }
     });
-
 });
 
