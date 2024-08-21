@@ -12,6 +12,9 @@ function debounce(func, delay) {
   };
 }
 
+// 全面的に処理変えなきゃー
+// うわーーーー
+
 (function () {
   // 1cssピクセルが実際は何物理ピクセルか
   console.log(window.devicePixelRatio)

@@ -1,6 +1,8 @@
 const ppi = 227
 // let ppi = 96
 
+// 多分こっちで取得できるの違うよね....みたいな
+
 document.addEventListener('DOMContentLoaded', function () {
     function pixelsToMeters(pixels) {
         const inches = (pixels * window.devicePixelRatio) / ppi;

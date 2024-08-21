@@ -2,24 +2,59 @@
 <html>
 
 <head>
-    <title>Scroll Tracker</title>
+    <title>Twitter Scroll Meter</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
             min-width: 230px;
+            background-color: #fafafa;
+            margin: 0;
+            padding: 10px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 1.3em;
+            margin-bottom: 5px;
+            margin-top: 0px;
+            font-weight: normal;
+            color: #333;
         }
 
         #result {
-            margin-top: 20px;
-            font-size: 300%;
+            font-size: 2.5em;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .container {
+            padding: 13px;
+            padding-right: 0px;
+            padding-left: 0px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+            width: 100%;
+            max-width: 250px;
+        }
+
+        #t {
+            margin: 0;
+            font-size: 1em;
+            color: #666;
         }
     </style>
 </head>
 
 <body>
-    <h2>Scroll Meter</h2>
-    <div>
-    You've scrolled<span id="result">???</span>[m]
+    <h2>Twitter Scroll Meter</h2>
+    <div class="container">
+        <p id="t">You've scrolled</p>
+        <span id="result">0</span>
+        <span id="t">[m]</span>
     </div>
     <script src="popup.js"></script>
 </body>

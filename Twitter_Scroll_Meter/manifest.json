@@ -5,12 +5,8 @@
     "description": "measure the scrolling distance on Twitter.",
     "permissions": [
         "storage",
-        "activeTab",
         "scripting"
     ],
-    "background": {
-        "service_worker": "background.js"
-    },
     "action": {
         "default_popup": "popup.html"
     },
