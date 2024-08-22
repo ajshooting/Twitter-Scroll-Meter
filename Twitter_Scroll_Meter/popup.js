@@ -1,6 +1,3 @@
-const ppi = 227
-// let ppi = 96
-
 document.addEventListener('DOMContentLoaded', function () {
 
     function updateDisplay(scrollDistance) {

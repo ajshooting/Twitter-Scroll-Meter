@@ -1,1 +1,8 @@
-chrome.tabs.create({ url: "your_page.html" });
+// 拡張機能の読み込み時に実行されると思います
+chrome.storage.local.get('devicePPI', function (data) {
+    var ppi = data.devicePPI || null;
+
+    if (!ppi) {
+        chrome.tabs.create({ url: "test.html" });
+    }
+});

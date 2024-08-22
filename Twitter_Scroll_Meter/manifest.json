@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "Twitter Scroll Meter",
     "version": "1.0",
-    "description": "measure the scrolling distance on Twitter.",
+    "description": "Twitterのスクロール量を計測します。",
     "permissions": [
         "storage",
         "scripting"
@@ -24,10 +24,12 @@
             ]
         }
     ],
+    "options_page": "test.html",
     "web_accessible_resources": [
         {
             "resources": [
-                "test.html"
+                "test.html",
+                "test.js"
             ],
             "matches": [
                 "<all_urls>"

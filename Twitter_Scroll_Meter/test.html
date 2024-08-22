@@ -3,6 +3,7 @@
 
 <head>
     <title>Test</title>
+    <meta charset="UTF-8">
     <style>
         /* 600x400の四角形のスタイル */
         #rectangle {
@@ -28,30 +29,32 @@
 
 <body>
 
-    <h2>ピクセル云々のテストをします</h2>
+    <h2>スクロール量を正確に測るために以下の情報を入れてください！</h2>
 
     <!-- ディスプレイのインチと解像度の入力フォーム -->
     <div class="input-group">
         <label for="screen-size">ディスプレイのサイズ（インチ）:</label>
-        <input type="number" id="screen-size" placeholder="例: 15.6" step="0.1">
+        <input type="number" id="screen-size" placeholder="ex: 15.6" step="0.1">
     </div>
 
     <div class="input-group">
         <label for="screen-width">解像度（横）:</label>
-        <input type="number" id="screen-width" placeholder="例: 1920">
+        <input type="number" id="screen-width" placeholder="ex: 1920">
     </div>
 
     <div class="input-group">
         <label for="screen-height">解像度（縦）:</label>
-        <input type="number" id="screen-height" placeholder="例: 1080">
+        <input type="number" id="screen-height" placeholder="ex: 1080">
     </div>
 
-    <button onclick="calculateAndDisplayPPI()">PPIを計算</button>
+    <button id="calculatePPI">PPIを計算・設定する</button>
 
     <!-- ディスプレイのPPIを表示する要素 -->
     <div id="ppi-display">PPI: 計算前...</div>
 
     <div id="ratio">ratio : </div>
+
+    <div id="result">---</div>
 
     <!-- 600x400の四角形 -->
     <div id="rectangle"></div>
@@ -60,33 +63,7 @@
     <br>
     <div id="moshikashite"></div>
 
-    <script>
-        function pixelsToMeters(pixels,ppi) {
-            const inches = (pixels * window.devicePixelRatio) / ppi;
-            const meters = inches * 0.0254;
-            return meters;
-        }
-
-        // PPIを計算し、表示する関数
-        function calculateAndDisplayPPI() {
-            const screenSize = parseFloat(document.getElementById('screen-size').value);
-            const screenWidth = parseInt(document.getElementById('screen-width').value);
-            const screenHeight = parseInt(document.getElementById('screen-height').value);
-
-            if (screenSize > 0 && screenWidth > 0 && screenHeight > 0) {
-                const screenDiagonalPixels = Math.sqrt(screenWidth ** 2 + screenHeight ** 2);
-                const ppi = screenDiagonalPixels / screenSize;
-                document.getElementById('ppi-display').textContent = 'PPI: ' + Math.round(ppi);
-                document.getElementById('ratio').textContent = 'ratio : ' + window.devicePixelRatio;
-                document.getElementById('tateyoko').textContent = '縦が' + pixelsToMeters(400,ppi)*100 + 'cm で、横が' + pixelsToMeters(600,ppi)*100 + 'cm だとめちゃ嬉しい'
-                document.getElementById('moshikashite').textContent = 'もしかしてだけど縦が' + pixelsToMeters(400,ppi) * (7 / 8)*100 + 'cm で、横が' + pixelsToMeters(600,ppi) * (7 / 8)*100 + 'cm の方が近かったら発狂する'
-            } else {
-                document.getElementById('ppi-display').textContent = '正しい値を入力してください。';
-            }
-        }
-
-
-    </script>
+<script src="test.js"></script>
 </body>
 
 </html>
