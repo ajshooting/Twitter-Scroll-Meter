@@ -2,7 +2,7 @@
 chrome.storage.local.get('devicePPI', function (data) {
     var ppi = data.devicePPI || null;
 
-    if (!ppi) {
+    if (!ppi || ppi == 0) {
         chrome.tabs.create({ url: "test.html" });
     }
 });

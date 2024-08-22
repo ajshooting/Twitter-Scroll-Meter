@@ -23,6 +23,10 @@ function debounce(func, delay) {
     // PPI
     chrome.storage.local.get('devicePPI', function (data) {
         ppi = data.devicePPI || 96;
+        if (ppi == 0) {
+            alert('PPIが0に設定されています。再設定してください。')
+            chrome.tabs.create({ url: "test.html" });
+        }
     });
 
     // CSSピクセルを物理ピクセルにしてからメートルに変換する、だと信じてる

@@ -10,7 +10,7 @@ function calculateAndDisplayPPI() {
     const screenWidth = parseInt(document.getElementById('screen-width').value);
     const screenHeight = parseInt(document.getElementById('screen-height').value);
 
-    if (screenSize > 0 && screenWidth > 0 && screenHeight > 0) {
+    if (screenSize > 0 && screenWidth > 0 && screenHeight > 0 && (screenDiagonalPixels / screenSize).toFixed(2) > 0) {
         const screenDiagonalPixels = Math.sqrt(screenWidth ** 2 + screenHeight ** 2);
         const ppi = screenDiagonalPixels / screenSize;
         document.getElementById('ppi-display').textContent = 'PPI: ' + ppi.toFixed(2);
