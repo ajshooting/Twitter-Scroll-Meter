@@ -34,8 +34,8 @@ function debounce(func, delay) {
 
     function updateScrollDistance() {
         const currentPosition = window.scrollY
-        //　魔法の7/8をかけることで精度が爆上がりする
-        const delta = Math.abs(currentPosition - lastPosition) * (7 / 8);
+        //　Retinaディスプレイの場合、魔法の7/8をかけることで精度が爆上がりするかも？？？
+        const delta = Math.abs(currentPosition - lastPosition);  //* (7 / 8)
         scrollMeters += pixelsToMeters(delta);
         lastPosition = currentPosition;
         chrome.storage.local.set({ scrollDistance: scrollMeters }, function () {
