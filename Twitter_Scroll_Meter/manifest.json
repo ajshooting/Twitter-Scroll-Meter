@@ -24,12 +24,12 @@
             ]
         }
     ],
-    "options_page": "test.html",
+    "options_page": "setting.html",
     "web_accessible_resources": [
         {
             "resources": [
-                "test.html",
-                "test.js"
+                "setting.html",
+                "setting.js"
             ],
             "matches": [
                 "<all_urls>"
