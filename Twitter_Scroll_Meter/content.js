@@ -38,15 +38,15 @@ function debounce(func, delay) {
 
     function updateScrollDistance() {
         const currentPosition = window.scrollY
-        //　Retinaディスプレイの場合、魔法の7/8をかけることで精度が爆上がりするかも？？？
+        // Retinaディスプレイの場合、魔法の7/8をかけることで精度が爆上がりするかも？？？
         const delta = Math.abs(currentPosition - lastPosition);  //* (7 / 8)
         scrollMeters += pixelsToMeters(delta);
         lastPosition = currentPosition;
-        chrome.storage.local.set({ scrollDistance: scrollMeters }, function () {
+        chrome.storage.local.set({ scrollMeters: scrollMeters }, function () {
             console.log(`Scroll distance saved: ${scrollMeters} meters`);
         });
         // popup.jsへ行きます
-        chrome.runtime.sendMessage({ scrollDistance: scrollMeters })
+        chrome.runtime.sendMessage({ scrollMeters: scrollMeters })
             .catch(e => {
             });
         requestId = null;
@@ -61,9 +61,9 @@ function debounce(func, delay) {
 
     window.addEventListener('scroll', debounce(handleScroll, 30));
 
-    chrome.storage.local.get('scrollDistance', function (data) {
-        if (data.scrollDistance) {
-            scrollMeters = data.scrollDistance;
+    chrome.storage.local.get('scrollMeters', function (data) {
+        if (data.scrollMeters) {
+            scrollMeters = data.scrollMeters;
             console.log(`Loaded saved distance: ${scrollMeters} meters`);
         }
     });
