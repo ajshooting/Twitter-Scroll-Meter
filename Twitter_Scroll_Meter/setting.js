@@ -30,11 +30,12 @@ document.getElementById('calculatePPI').addEventListener('click', function () {
     calculateAndDisplayPPI()
 });
 
-document.onload = function () {
+document.addEventListener('DOMContentLoaded', function () {
     chrome.storage.local.get('devicePPI', function (data) {
         ppi = data.devicePPI;
         if (ppi) {
             document.getElementById('ppi-display').textContent = 'PPI: ' + ppi + ' に設定済み';
         }
     });
-}
+});
+
