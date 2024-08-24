@@ -10,13 +10,14 @@ function calculateAndDisplayPPI() {
     const screenWidth = parseInt(document.getElementById('screen-width').value);
     const screenHeight = parseInt(document.getElementById('screen-height').value);
 
-    if (screenSize > 0 && screenWidth > 0 && screenHeight > 0 && (Math.sqrt(screenWidth ** 2 + screenHeight ** 2) / screenSize).toFixed(2) > 0) {
-        const screenDiagonalPixels = Math.sqrt(screenWidth ** 2 + screenHeight ** 2);
-        const ppi = screenDiagonalPixels / screenSize;
+    const screenDiagonalPixels = Math.sqrt(screenWidth ** 2 + screenHeight ** 2);
+    const ppi = (screenDiagonalPixels / screenSize).toFixed(2);
 
-        chrome.storage.local.set({ devicePPI: ppi.toFixed(2) }, function () {
-            document.getElementById('ppi-display').textContent = 'PPI: ' + ppi.toFixed(2) + ' に設定完了';
-            console.log(`PPI saved: ${ppi.toFixed(2)}`);
+    if (screenSize > 0 && screenWidth > 0 && ppi > 0) {
+
+        chrome.storage.local.set({ devicePPI: ppi }, function () {
+            document.getElementById('ppi-display').textContent = 'PPI: ' + ppi + ' に設定完了';
+            console.log(`PPI saved: ${ppi}`);
         });
 
         document.getElementById('tateyoko').textContent = '縦が' + pixelsToMeters(400, ppi) * 100 + 'cm で、横が' + pixelsToMeters(600, ppi) * 100 + 'cm だとめちゃ嬉しい'
