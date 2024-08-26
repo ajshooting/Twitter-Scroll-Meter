@@ -27,16 +27,58 @@ function calculateAndDisplayPPI() {
     }
 }
 
+function setDD() {
+    const DD = parseInt(document.getElementById('debounceDelay').value);
+    if (DD >= 0) {
+        chrome.storage.local.set({ debounceDelay: DD }, function () {
+            alert(`debounceDelayの設定が完了 : ${DD}`);
+            console.log(`debounceDelay set: ${DD}`);
+        });
+    } else {
+        alert("負の値は設定できません");
+    }
+}
+
+function setFactor() {
+    const factor = parseFloat(document.getElementById('debounceDelay').value);
+    if (factor > 0) {
+        chrome.storage.local.set({ factor: factor }, function () {
+            alert(`Factorの設定が完了 : ${factor}`);
+            console.log(`Factor set: ${factor}`);
+        });
+    } else {
+        alert("負の値は設定できません");
+    }
+}
+
 document.getElementById('calculatePPI').addEventListener('click', function () {
     calculateAndDisplayPPI()
 });
 
+document.getElementById('setDebounceDelay').addEventListener('click', function () {
+    setDD()
+});
+
+document.getElementById('setFactor').addEventListener('click', function () {
+    setFactor()
+});
+
 document.addEventListener('DOMContentLoaded', function () {
     chrome.storage.local.get('devicePPI', function (data) {
-        ppi = data.devicePPI;
+        const ppi = data.devicePPI;
         if (ppi) {
             document.getElementById('ppi-display').textContent = 'PPI: ' + ppi + ' に設定済み';
         }
+    });
+
+    chrome.storage.local.get('debounceDelay', function (data) {
+        const DD = data.debounceDelay || 30;
+        document.getElementById('debounceDelay').value = DD;
+    });
+
+    chrome.storage.local.get('factor', function (data) {
+        const factor = data.factor || 1;
+        document.getElementById('factor').value = factor;
     });
 });
 

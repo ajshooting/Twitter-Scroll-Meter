@@ -1,5 +1,7 @@
 let requestId = null;
 let ppi = 96;
+let DD = 30;
+let factor = 1;
 
 function debounce(func, delay) {
     let timeoutId;
@@ -29,6 +31,14 @@ function debounce(func, delay) {
         }
     });
 
+    chrome.storage.local.get('debounceDelay', function (data) {
+        DD = data.debounceDelay || 30;
+    });
+
+    chrome.storage.local.get('factor', function (data) {
+        factor = data.factor || 1;
+    });
+
     // CSSピクセルを物理ピクセルにしてからメートルに変換する、だと信じてる
     function pixelsToMeters(pixels) {
         const inches = (pixels * window.devicePixelRatio) / ppi;
@@ -38,8 +48,8 @@ function debounce(func, delay) {
 
     function updateScrollDistance() {
         const currentPosition = window.scrollY
-        // Retinaディスプレイの場合、魔法の7/8をかけることで精度が爆上がりするかも？？？
-        const delta = Math.abs(currentPosition - lastPosition);  //* (7 / 8)
+        // Retinaディスプレイの場合、魔法の7/8をかけることで精度が爆上がりするかも？？？<-Factorで対応
+        const delta = Math.abs(currentPosition - lastPosition) * factor;
         scrollMeters += pixelsToMeters(delta);
         lastPosition = currentPosition;
         chrome.storage.local.set({ scrollMeters: scrollMeters }, function () {
@@ -59,7 +69,7 @@ function debounce(func, delay) {
         }
     }
 
-    window.addEventListener('scroll', debounce(handleScroll, 30));
+    window.addEventListener('scroll', debounce(handleScroll, DD));
 
     chrome.storage.local.get('scrollMeters', function (data) {
         if (data.scrollMeters) {
