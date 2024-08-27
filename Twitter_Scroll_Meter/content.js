@@ -62,7 +62,7 @@ function debounce(func, delay) {
         requestId = null;
     }
 
-    // これ！
+    // ここから
     function handleScroll() {
         if (!requestId) {
             requestId = requestAnimationFrame(updateScrollDistance);
@@ -77,4 +77,14 @@ function debounce(func, delay) {
             console.log(`Loaded saved distance: ${scrollMeters} meters`);
         }
     });
+
+    // 遷移時におかしくならないようにしたい
+    let lastUrl = location.href;
+    new MutationObserver(() => {
+        const url = location.href;
+        if (url !== lastUrl) {
+            lastUrl = url;
+            lastPosition = window.screenY;
+        }
+    }).observe(document, { subtree: true, childList: true });
 })();
