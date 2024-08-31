@@ -20,8 +20,8 @@ function calculateAndDisplayPPI() {
             console.log(`PPI saved: ${ppi}`);
         });
 
-        document.getElementById('tateyoko').textContent = '縦が' + pixelsToMeters(400, ppi) * 100 + 'cm で、横が' + pixelsToMeters(600, ppi) * 100 + 'cm だとめちゃ嬉しい'
-        document.getElementById('moshikashite').textContent = 'もしかしてだけど縦が' + pixelsToMeters(400, ppi) * (7 / 8) * 100 + 'cm で、横が' + pixelsToMeters(600, ppi) * (7 / 8) * 100 + 'cm の方が近かったら発狂する'
+        document.getElementById('tateyoko').textContent = '縦が' + pixelsToMeters(200, ppi) * 100 + 'cm で、横が' + pixelsToMeters(300, ppi) * 100 + 'cm だとめちゃ嬉しい'
+        document.getElementById('moshikashite').textContent = 'もしかしてだけど縦が' + pixelsToMeters(200, ppi) * (7 / 8) * 100 + 'cm で、横が' + pixelsToMeters(300, ppi) * (7 / 8) * 100 + 'cm の方が近かったら発狂する'
     } else {
         document.getElementById('ppi-display').textContent = '正しい値を入力してください。';
     }
@@ -40,7 +40,7 @@ function setDD() {
 }
 
 function setFactor() {
-    const factor = parseFloat(document.getElementById('debounceDelay').value);
+    const factor = parseFloat(document.getElementById('factor').value);
     if (factor > 0) {
         chrome.storage.local.set({ factor: factor }, function () {
             alert(`Factorの設定が完了 : ${factor}`);
@@ -82,3 +82,5 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
+// ↑再読み込みさせたほうがいいかもな〜
+// させないならどうにか反映させてあげて
