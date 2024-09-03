@@ -27,7 +27,7 @@ function debounce(func, delay) {
         ppi = data.devicePPI || 96;
         if (ppi == 0) {
             alert('PPIが0に設定されています。再設定してください。')
-            chrome.tabs.create({ url: "test.html" });
+            chrome.tabs.create({ url: "setting.html" });
         }
     });
 
@@ -46,15 +46,18 @@ function debounce(func, delay) {
         return meters;
     }
 
-    function updateScrollDistance() {
+    async function updateScrollDistance() {
         const currentPosition = window.scrollY
         // Retinaディスプレイの場合、魔法の7/8をかけることで精度が爆上がりするかも？？？<-Factorで対応
         const delta = Math.abs(currentPosition - lastPosition) * factor;
         scrollMeters += pixelsToMeters(delta);
         lastPosition = currentPosition;
-        chrome.storage.local.set({ scrollMeters: scrollMeters }, function () {
-            console.log(`Scroll distance saved: ${scrollMeters} meters`);
-        });
+        // ここどうなん？
+        try {
+            await chrome.storage.local.set({ scrollMeters: scrollMeters }, function () {
+                console.log(`Scroll distance saved: ${scrollMeters} meters`);
+            });
+        } catch (e) { }
         // popup.jsへ行きます
         chrome.runtime.sendMessage({ scrollMeters: scrollMeters })
             .catch(e => {
