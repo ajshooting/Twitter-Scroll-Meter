@@ -91,3 +91,6 @@ function debounce(func, delay) {
         }
     }).observe(document, { subtree: true, childList: true });
 })();
+
+// 全部相対値計算にすればいいのでは？
+// また、大幅な変更が必要そう
