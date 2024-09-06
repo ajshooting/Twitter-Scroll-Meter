@@ -57,17 +57,11 @@ function setFactor() {
     }
 }
 
-document.getElementById('calculatePPI').addEventListener('click', function () {
-    setPPI()
-});
+document.getElementById('calculatePPI').addEventListener('click', setPPI());
 
-document.getElementById('setDebounceDelay').addEventListener('click', function () {
-    setDD()
-});
+document.getElementById('setDebounceDelay').addEventListener('click', setDD());
 
-document.getElementById('setFactor').addEventListener('click', function () {
-    setFactor()
-});
+document.getElementById('setFactor').addEventListener('click', setFactor());
 
 // 初期設定
 document.addEventListener('DOMContentLoaded', function () {

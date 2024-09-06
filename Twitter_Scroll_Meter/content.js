@@ -2,6 +2,8 @@ let requestId = null;
 let ppi = 96;
 let DD = 30;
 let factor = 1;
+let scrollMeters = 0;
+let lastPosition = 0;
 
 function debounce(func, delay) {
     let timeoutId;
@@ -15,82 +17,81 @@ function debounce(func, delay) {
     };
 }
 
-(function () {
-    // 1cssピクセルが実際は何物理ピクセルか
-    console.log(window.devicePixelRatio)
+// CSSピクセルを物理ピクセルにしてからメートルに変換する
+function pixelsToMeters(pixels) {
+    const inches = (pixels * window.devicePixelRatio) / ppi;
+    return inches * 0.0254;
+}
 
-    let scrollMeters = 0;
-    let lastPosition = window.scrollY;
+// 読み込む
+async function loadSettings() {
+    const data = await chrome.storage.local.get(['devicePPI', 'debounceDelay', 'factor', 'scrollMeters']);
+    ppi = data.devicePPI || 96;
+    DD = data.debounceDelay || 30;
+    factor = data.factor || 1;
+    scrollMeters = data.scrollMeters || 0;
 
-    // PPI
-    chrome.storage.local.get('devicePPI', function (data) {
-        ppi = data.devicePPI || 96;
-        if (ppi == 0) {
-            alert('PPIが0に設定されています。再設定してください。')
-            chrome.tabs.create({ url: "setting.html" });
-        }
-    });
-
-    chrome.storage.local.get('debounceDelay', function (data) {
-        DD = data.debounceDelay || 30;
-    });
-
-    chrome.storage.local.get('factor', function (data) {
-        factor = data.factor || 1;
-    });
-
-    // CSSピクセルを物理ピクセルにしてからメートルに変換する、だと信じてる
-    function pixelsToMeters(pixels) {
-        const inches = (pixels * window.devicePixelRatio) / ppi;
-        const meters = inches * 0.0254;
-        return meters;
+    if (ppi == 0) {
+        alert('PPIが0に設定されています。再設定してください。')
+        chrome.tabs.create({ url: "setting.html" });
+    } else {
+        console.log(`Loaded settings: PPI=${ppi}, debounceDelay=${DD}, factor=${factor}, scrollMeters=${scrollMeters}`);
     }
+}
 
-    async function updateScrollDistance() {
-        const currentPosition = window.scrollY
-        // Retinaディスプレイの場合、魔法の7/8をかけることで精度が爆上がりするかも？？？<-Factorで対応
-        const delta = Math.abs(currentPosition - lastPosition) * factor;
-        scrollMeters += pixelsToMeters(delta);
-        lastPosition = currentPosition;
-        // ここどうなん？
-        try {
-            await chrome.storage.local.set({ scrollMeters: scrollMeters }, function () {
-                console.log(`Scroll distance saved: ${scrollMeters} meters`);
-            });
-        } catch (e) { }
-        // popup.jsへ行きます
-        chrome.runtime.sendMessage({ scrollMeters: scrollMeters })
-            .catch(e => {
-            });
-        requestId = null;
+// スクロール距離の保存
+async function saveScrollMeters() {
+    try {
+        await chrome.storage.local.set({ scrollMeters });
+        console.log(`Scroll distance saved: ${scrollMeters} meters`);
+    } catch (error) {
+        console.error('Failed to save scroll distance:', error);
     }
+}
 
-    // ここから
-    function handleScroll() {
-        if (!requestId) {
-            requestId = requestAnimationFrame(updateScrollDistance);
-        }
+// スクロール距離の更新
+async function updateScrollDistance() {
+    const currentPosition = window.scrollY;
+    const delta = Math.abs(currentPosition - lastPosition) * factor;
+    scrollMeters += pixelsToMeters(delta);
+    lastPosition = currentPosition;
+
+    await saveScrollMeters();
+
+    // popup.jsへ
+    chrome.runtime.sendMessage({ scrollMeters: scrollMeters })
+        .catch(e => {
+        });
+    requestId = null;
+}
+
+function handleScroll() {
+    if (!requestId) {
+        requestId = requestAnimationFrame(updateScrollDistance);
     }
+}
 
-    window.addEventListener('scroll', debounce(handleScroll, DD));
-
-    chrome.storage.local.get('scrollMeters', function (data) {
-        if (data.scrollMeters) {
-            scrollMeters = data.scrollMeters;
-            console.log(`Loaded saved distance: ${scrollMeters} meters`);
-        }
-    });
-
-    // 遷移時におかしくならないようにしたい
+// URLの変更を検知
+function monitorUrlChanges() {
     let lastUrl = location.href;
     new MutationObserver(() => {
         const url = location.href;
         if (url !== lastUrl) {
             lastUrl = url;
-            lastPosition = window.screenY;
+            lastPosition = window.scrollY;
         }
     }).observe(document, { subtree: true, childList: true });
-})();
+}
 
-// 全部相対値計算にすればいいのでは？
-// また、大幅な変更が必要そう
+
+
+(async function () {
+    console.log(`Device pixel ratio: ${window.devicePixelRatio}`);
+    lastPosition = window.scrollY;
+
+    await loadSettings();
+
+    window.addEventListener('scroll', debounce(handleScroll, DD));
+
+    monitorUrlChanges();
+})();
