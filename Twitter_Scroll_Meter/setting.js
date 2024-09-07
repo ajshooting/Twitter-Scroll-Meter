@@ -10,7 +10,7 @@ function setPPI() {
     const screenWidth = parseInt(document.getElementById('screen-width').value);
     const screenHeight = parseInt(document.getElementById('screen-height').value);
     const screenDiagonalPixels = Math.sqrt(screenWidth ** 2 + screenHeight ** 2);
-    const ppi = (screenDiagonalPixels / screenSize).toFixed(2);
+    const ppi = (screenDiagonalPixels / screenSize).toFixed();
     if (screenSize > 0 && screenWidth > 0 && ppi > 0) {
         chrome.storage.local.set({ devicePPI: ppi }, function () {
             document.getElementById('ppi-display').textContent = 'PPI: ' + ppi + ' に設定完了';
@@ -30,7 +30,7 @@ function setDD() {
     const DD = parseInt(document.getElementById('debounceDelay').value);
     if (DD >= 0) {
         chrome.storage.local.set({ debounceDelay: DD }, function () {
-            alert(`debounceDelayの設定が完了 : ${DD}`);
+            alert(`debounceDelayの設定が完了 : ${DD} \n 設定を反映させるためにX/Twitterを再読み込みさせてください`);
             console.log(`debounceDelay set: ${DD}`);
         });
     } else {
@@ -42,7 +42,7 @@ function setFactor() {
     const factor = parseFloat(document.getElementById('factor').value);
     if (factor > 0) {
         chrome.storage.local.set({ factor: factor }, function () {
-            alert(`Factorの設定が完了 : ${factor}`);
+            alert(`Factorの設定が完了 : ${factor} \n 設定を反映させるためにX/Twitterを再読み込みさせてください`);
             console.log(`Factor set: ${factor}`);
         });
         // 縦横の変更
@@ -57,15 +57,10 @@ function setFactor() {
     }
 }
 
-document.getElementById('calculatePPI').addEventListener('click', setPPI());
-
-document.getElementById('setDebounceDelay').addEventListener('click', setDD());
-
-document.getElementById('setFactor').addEventListener('click', setFactor());
 
 // 初期設定
-document.addEventListener('DOMContentLoaded', function () {
-    chrome.storage.local.get(['devicePPI', 'factor', 'debounceDelay'], function (data) {
+document.addEventListener('DOMContentLoaded', async function () {
+    await chrome.storage.local.get(['devicePPI', 'factor', 'debounceDelay'], function (data) {
         const ppi = data.devicePPI;
         const factor = data.factor || 1;
         const DD = data.debounceDelay || 30;
@@ -77,7 +72,12 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('tateyoko').textContent = '縦:' + (pixelsToMeters(200, ppi).toFixed(2) * 100 * factor) + 'cm / 横:' + (pixelsToMeters(300, ppi).toFixed(1) * 100 * factor) + 'cm';
         }
     });
+
+    document.getElementById('calculatePPI').addEventListener('click', setPPI);
+
+    document.getElementById('setDebounceDelay').addEventListener('click', setDD);
+
+    document.getElementById('setFactor').addEventListener('click', setFactor);
 });
 
-// ↑再読み込みさせたほうがいいかもな〜
-// させないならどうにか反映させてあげて
+// 情報をcontent.jsに送信後、

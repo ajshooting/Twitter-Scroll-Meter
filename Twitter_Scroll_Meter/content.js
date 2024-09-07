@@ -78,7 +78,14 @@ function monitorUrlChanges() {
         const url = location.href;
         if (url !== lastUrl) {
             lastUrl = url;
-            lastPosition = window.scrollY;
+            // DOMの変更を監視
+            new MutationObserver((mutations, observer) => {
+                if (document.readyState === 'complete') {
+                    lastPosition = window.scrollY;
+                    console.log(`DOM変更検知 lp:${lastPosition}`);
+                    observer.disconnect();
+                }
+            }).observe(document, { childList: true, subtree: true });
         }
     }).observe(document, { subtree: true, childList: true });
 }
