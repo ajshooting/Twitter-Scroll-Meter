@@ -21,6 +21,8 @@ function setPPI() {
             const factor = data.factor || 1;
             document.getElementById('tateyoko').textContent = '縦:' + (pixelsToMeters(200, ppi).toFixed(2) * 100 * factor) + 'cm / 横:' + (pixelsToMeters(300, ppi).toFixed(1) * 100 * factor) + 'cm';
         });
+        // 情報送信
+        sendInfo()
     } else {
         document.getElementById('ppi-display').textContent = '正しい値を入力してください。';
     }
@@ -33,6 +35,8 @@ function setDD() {
             alert(`debounceDelayの設定が完了 : ${DD} \n 設定を反映させるためにX/Twitterを再読み込みさせてください`);
             console.log(`debounceDelay set: ${DD}`);
         });
+        // 情報送信
+        sendInfo()
     } else {
         alert("負の値は設定できません");
     }
@@ -52,9 +56,23 @@ function setFactor() {
                 document.getElementById('tateyoko').textContent = '縦:' + (pixelsToMeters(200, ppi).toFixed(2) * 100 * factor) + 'cm / 横:' + (pixelsToMeters(300, ppi).toFixed(1) * 100 * factor) + 'cm';
             }
         });
+        // 情報送信
+        sendInfo()
     } else {
         alert("負の値は設定できません");
     }
+}
+
+// 設定した情報を送信する
+async function sendInfo() {
+    await chrome.storage.local.get(['devicePPI', 'factor', 'debounceDelay'], function (data) {
+        const ppi = data.devicePPI;
+        const factor = data.factor || 1;
+        const DD = data.debounceDelay || 30;
+        chrome.runtime.sendMessage({ devicePPI: ppi, factor: factor, debounceDelay: DD })
+            .catch(e => {
+            });
+    });
 }
 
 

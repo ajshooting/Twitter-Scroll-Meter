@@ -89,6 +89,8 @@ function monitorUrlChanges() {
         }
     }).observe(document, { subtree: true, childList: true });
 }
+// ↑上手くいかない、URL遷移後のwindow.scrollYが173.8889固定になってしまう
+// なんで？？？？
 
 
 
@@ -97,6 +99,16 @@ function monitorUrlChanges() {
     lastPosition = window.scrollY;
 
     await loadSettings();
+
+    // setting.jsからの情報を受信する
+    chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+        if (request.devicePPI !== undefined) {
+            ppi = request.devicePPI;
+            factor = request.factor;
+            DD = request.debounceDelay;
+            console.log(`receive info / ppi:${ppi},factor:${factor},DD:${DD}`)
+        }
+    });
 
     window.addEventListener('scroll', debounce(handleScroll, DD));
 
