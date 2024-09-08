@@ -65,36 +65,33 @@ function setFactor() {
 
 // 設定した情報を送信する
 async function sendInfo() {
-    await chrome.storage.local.get(['devicePPI', 'factor', 'debounceDelay'], function (data) {
-        const ppi = data.devicePPI;
-        const factor = data.factor || 1;
-        const DD = data.debounceDelay || 30;
-        chrome.runtime.sendMessage({ devicePPI: ppi, factor: factor, debounceDelay: DD })
-            .catch(e => {
-            });
-    });
+    const data = await chrome.storage.local.get(['devicePPI', 'debounceDelay', 'factor']);
+    const ppi = data.devicePPI;
+    const factor = data.factor || 1;
+    const DD = data.debounceDelay || 30;
+
+    chrome.runtime.sendMessage({ devicePPI: ppi, factor: factor, debounceDelay: DD })
+        .catch(e => {
+        });
 }
 
 
 // 初期設定
 document.addEventListener('DOMContentLoaded', async function () {
-    await chrome.storage.local.get(['devicePPI', 'factor', 'debounceDelay'], function (data) {
-        const ppi = data.devicePPI;
-        const factor = data.factor || 1;
-        const DD = data.debounceDelay || 30;
+    const data = await chrome.storage.local.get(['devicePPI', 'debounceDelay', 'factor']);
+    const ppi = data.devicePPI;
+    const factor = data.factor || 1;
+    const DD = data.debounceDelay || 30;
 
-        document.getElementById('factor').value = factor;
-        document.getElementById('debounceDelay').value = DD;
-        if (ppi) {
-            document.getElementById('ppi-display').textContent = 'PPI: ' + ppi + ' に設定済み';
-            document.getElementById('tateyoko').textContent = '縦:' + (pixelsToMeters(200, ppi).toFixed(2) * 100 * factor) + 'cm / 横:' + (pixelsToMeters(300, ppi).toFixed(1) * 100 * factor) + 'cm';
-        }
-    });
+    document.getElementById('factor').value = factor;
+    document.getElementById('debounceDelay').value = DD;
+    if (ppi) {
+        document.getElementById('ppi-display').textContent = 'PPI: ' + ppi + ' に設定済み';
+        document.getElementById('tateyoko').textContent = '縦:' + (pixelsToMeters(200, ppi).toFixed(2) * 100 * factor) + 'cm / 横:' + (pixelsToMeters(300, ppi).toFixed(1) * 100 * factor) + 'cm';
+    }
 
     document.getElementById('calculatePPI').addEventListener('click', setPPI);
-
     document.getElementById('setDebounceDelay').addEventListener('click', setDD);
-
     document.getElementById('setFactor').addEventListener('click', setFactor);
 });
 
