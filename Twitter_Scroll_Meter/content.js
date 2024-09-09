@@ -30,7 +30,6 @@ async function loadSettings() {
     DD = data.debounceDelay || 30;
     factor = data.factor || 1;
     scrollMeters = data.scrollMeters || 0;
-
     if (ppi == 0) {
         alert('PPIが0に設定されています。再設定してください。')
         chrome.tabs.create({ url: "setting.html" });
@@ -57,7 +56,6 @@ async function updateScrollDistance() {
     lastPosition = currentPosition;
 
     await saveScrollMeters();
-
     // popup.jsへ
     chrome.runtime.sendMessage({ scrollMeters: scrollMeters })
         .catch(e => {
@@ -74,24 +72,33 @@ function handleScroll() {
 // URLの変更を検知
 function monitorUrlChanges() {
     let lastUrl = location.href;
-    new MutationObserver(() => {
+    const checkUrlChange = () => {
         const url = location.href;
         if (url !== lastUrl) {
             lastUrl = url;
-            // DOMの変更を監視
-            new MutationObserver((mutations, observer) => {
-                if (document.readyState === 'complete') {
-                    lastPosition = window.scrollY;
-                    console.log(`DOM変更検知 lp:${lastPosition}`);
-                    observer.disconnect();
-                }
-            }).observe(document, { childList: true, subtree: true });
+            onUrlChange();
         }
-    }).observe(document, { subtree: true, childList: true });
+    };
+    const onUrlChange = () => {
+        const waitForPageLoad = () => {
+            // これ挟まないとwindow.scrollYが173.88くらいに固定されちゃう
+            setTimeout(() => {
+                lastPosition = window.scrollY;
+                console.log(`遷移後位置: ${lastPosition}`);
+            }, 0);
+        };
+        waitForPageLoad();
+    };
+    // URL変更の監視
+    new MutationObserver(checkUrlChange).observe(document, { subtree: true, childList: true });
+    // SPAの対応
+    window.addEventListener('popstate', checkUrlChange);
+    const originalPushState = history.pushState;
+    history.pushState = function (...args) {
+        originalPushState.apply(this, args);
+        checkUrlChange();
+    };
 }
-// ↑上手くいかない、URL遷移後のwindow.scrollYが173.8889固定になってしまう
-// なんで？？？？
-
 
 
 (async function () {
@@ -101,6 +108,7 @@ function monitorUrlChanges() {
     await loadSettings();
 
     // setting.jsからの情報を受信する
+    // うごかない
     chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         if (request.devicePPI !== undefined) {
             ppi = request.devicePPI;
@@ -109,8 +117,18 @@ function monitorUrlChanges() {
             console.log(`receive info / ppi:${ppi},factor:${factor},DD:${DD}`)
         }
     });
-
     window.addEventListener('scroll', debounce(handleScroll, DD));
 
     monitorUrlChanges();
+
+
+
+    let initialZoom = window.devicePixelRatio;
+
+    window.addEventListener('resize', () => {
+        if (window.devicePixelRatio !== initialZoom) {
+            console.log('Zoom level changed');
+            initialZoom = window.devicePixelRatio;
+        }
+    });
 })();
