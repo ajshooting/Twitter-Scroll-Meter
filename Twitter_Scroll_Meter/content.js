@@ -109,6 +109,7 @@ function monitorUrlChanges() {
 
     // setting.jsからの情報を受信する
     // うごかない
+    // Reload指示のみでOKでは？
     chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         if (request.devicePPI !== undefined) {
             ppi = request.devicePPI;
@@ -121,8 +122,6 @@ function monitorUrlChanges() {
 
     monitorUrlChanges();
 
-
-
     let initialZoom = window.devicePixelRatio;
 
     window.addEventListener('resize', () => {
@@ -131,4 +130,6 @@ function monitorUrlChanges() {
             initialZoom = window.devicePixelRatio;
         }
     });
+
+    // 高頻度で await loadSettings(); させるという手もあるけどまぁいいかなーって感じ
 })();

@@ -3,7 +3,7 @@ async function loadData() {
     const data = await chrome.storage.local.get('devicePPI');
     let ppi = data.devicePPI || null;
     if (!ppi || ppi == 0) {
-        chrome.tabs.create({ url: "test.html" });
+        chrome.tabs.create({ url: "setting.html" });
     }
 }
 

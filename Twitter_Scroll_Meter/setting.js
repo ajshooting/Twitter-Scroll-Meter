@@ -66,6 +66,7 @@ function setFactor() {
 
 // 設定した情報を送信する
 // < う ご か な い >
+// というより新タブで開いてる時もあるんだし動かなくて当然では？
 async function sendInfo() {
     const data = await chrome.storage.local.get(['devicePPI', 'debounceDelay', 'factor']);
     const ppi = data.devicePPI;
@@ -94,4 +95,9 @@ document.addEventListener('DOMContentLoaded', async function () {
     document.getElementById('calculatePPI').addEventListener('click', setPPI);
     document.getElementById('setDebounceDelay').addEventListener('click', setDD);
     document.getElementById('setFactor').addEventListener('click', setFactor);
+
+    // debug用
+    // document.getElementById('newtab').addEventListener('click', function () {
+    //     chrome.tabs.create({ url: "setting.html" });
+    // });
 });
