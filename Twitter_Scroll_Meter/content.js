@@ -3,6 +3,7 @@ let ppi = 96;
 let DD = 30;
 let factor = 1;
 let scrollMeters = 0;
+let measureType = "both"
 let lastPosition = 0;
 
 function debounce(func, delay) {
@@ -25,11 +26,12 @@ function pixelsToMeters(pixels) {
 
 // 読み込む
 async function loadSettings() {
-    const data = await chrome.storage.local.get(['devicePPI', 'debounceDelay', 'factor', 'scrollMeters']);
+    const data = await chrome.storage.local.get(['devicePPI', 'debounceDelay', 'factor', 'scrollMeters', 'measureType']);
     ppi = data.devicePPI || 96;
     DD = data.debounceDelay || 30;
     factor = data.factor || 1;
     scrollMeters = data.scrollMeters || 0;
+    measureType = data.measureType || "both";
     if (ppi == 0) {
         alert('PPIが0に設定されています。再設定してください。')
         chrome.tabs.create({ url: "setting.html" });
@@ -51,7 +53,14 @@ async function saveScrollMeters() {
 // スクロール距離の更新
 async function updateScrollDistance() {
     const currentPosition = window.scrollY;
-    const delta = Math.abs(currentPosition - lastPosition) * factor;
+    let delta;
+    if (measureType == "both") {
+        delta = Math.abs(currentPosition - lastPosition) * factor;
+    } else if (measureType == "upOnly") {
+        delta = (currentPosition - lastPosition) < 0 ? Math.abs(currentPosition - lastPosition) * factor : 0;
+    } else {
+        delta = (currentPosition - lastPosition) > 0 ? Math.abs(currentPosition - lastPosition) * factor : 0;
+    }
     scrollMeters += pixelsToMeters(delta);
     lastPosition = currentPosition;
 

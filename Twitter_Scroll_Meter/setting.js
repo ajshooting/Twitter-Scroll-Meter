@@ -80,13 +80,15 @@ async function sendInfo() {
 
 // 初期設定
 document.addEventListener('DOMContentLoaded', async function () {
-    const data = await chrome.storage.local.get(['devicePPI', 'debounceDelay', 'factor']);
+    const data = await chrome.storage.local.get(['devicePPI', 'debounceDelay', 'factor', 'measureType']);
     const ppi = data.devicePPI;
     const factor = data.factor || 1;
     const DD = data.debounceDelay || 30;
+    let measureType = data.measureType || "both";
 
     document.getElementById('factor').value = factor;
     document.getElementById('debounceDelay').value = DD;
+    document.getElementById('measure_type').value = measureType;
     if (ppi) {
         document.getElementById('ppi-display').textContent = 'PPI: ' + ppi + ' に設定済み';
         document.getElementById('tateyoko').textContent = '縦:' + (pixelsToMeters(200, ppi) * 100 * factor).toFixed(2) + 'cm / 横:' + (pixelsToMeters(300, ppi) * 100 * factor).toFixed(2) + 'cm';
@@ -95,6 +97,13 @@ document.addEventListener('DOMContentLoaded', async function () {
     document.getElementById('calculatePPI').addEventListener('click', setPPI);
     document.getElementById('setDebounceDelay').addEventListener('click', setDD);
     document.getElementById('setFactor').addEventListener('click', setFactor);
+
+    document.getElementById('measure_type').addEventListener('change', function () {
+        let measureType = this.value;
+        chrome.storage.local.set({ measureType: measureType }, function () {
+            console.log(`measureType set: ${measureType}`);
+        });
+    });
 
     // debug用
     // document.getElementById('newtab').addEventListener('click', function () {

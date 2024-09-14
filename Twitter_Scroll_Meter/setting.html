@@ -60,6 +60,14 @@
 
         <h3>高度な設定</h3>
         <div class="input-group">
+            <label for="measure_type">計測タイミング :</label>
+            <select id="measure_type">
+                <option value="both" selected>全てのスクロール</option>
+                <option value="downOnly">下スクロールのみ</option>
+                <option value="upOnly">(上スクロールのみ)</option>
+            </select>
+        </div>
+        <div class="input-group">
             <label for="debounceDelay">更新頻度 :</label>
             <input type="number" id="debounceDelay" placeholder="default: 30">
             <button id="setDebounceDelay">設定する</button>
@@ -70,7 +78,7 @@
             <button id="setFactor">設定する</button>
         </div>
         <div>(自分が確認したRetinaﾃﾞｨｽﾌﾟﾚｲだと0.885がおすすめ)</div>
-        <br>
+        <!-- <br> -->
         <!-- <button id="newtab">newtabで開く</button> -->
         <script src="setting.js"></script>
 </body>
