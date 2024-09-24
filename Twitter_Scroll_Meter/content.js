@@ -42,6 +42,7 @@ async function loadSettings() {
 
 // スクロール距離の保存
 async function saveScrollMeters() {
+    if (!chrome.storage || !chrome.storage.local) { return false; }
     try {
         await chrome.storage.local.set({ scrollMeters });
         console.log(`Scroll distance saved: ${scrollMeters} meters`);
@@ -66,6 +67,7 @@ async function updateScrollDistance() {
 
     await saveScrollMeters();
     // popup.jsへ
+    if (!chrome.runtime || !chrome.runtime.sendMessage) { return false; }
     chrome.runtime.sendMessage({ scrollMeters: scrollMeters })
         .catch(e => {
         });
