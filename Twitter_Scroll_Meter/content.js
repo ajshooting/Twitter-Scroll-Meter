@@ -1,8 +1,18 @@
+// やることメモ
+// 
+// ->history
+// 0保存回避
+// ひゅんって戻った時のために閾値で
+// 再読み込み検知してURL遷移時と同じような処理
+// settingsからcontentにsendする
+// PPI は別ページで設定させるようにする！
+
 let requestId = null;
 let ppi = 96;
 let DD = 30;
 let factor = 1;
-let scrollMeters = 0;
+let scrollDistance = 0;
+let useUnit = "meters"
 let measureType = "both"
 let lastPosition = 0;
 
@@ -19,35 +29,37 @@ function debounce(func, delay) {
 }
 
 // CSSピクセルを物理ピクセルにしてからメートルに変換する
-function pixelsToMeters(pixels) {
-    const inches = (pixels * window.devicePixelRatio) / ppi;
-    return inches * 0.0254;
-}
+// function pixelsToMeters(pixels) {
+//     const inches = (pixels * window.devicePixelRatio) / ppi;
+//     return inches * 0.0254;
+// }
 
 // 読み込む
 async function loadSettings() {
-    const data = await chrome.storage.local.get(['devicePPI', 'debounceDelay', 'factor', 'scrollMeters', 'measureType']);
+    const data = await chrome.storage.local.get(['devicePPI', 'debounceDelay', 'factor', 'scrollDistance', 'measureType', 'useUnit']);
     ppi = data.devicePPI || 96;
-    DD = data.debounceDelay || 30;
+    DD = (data.debounceDelay !== undefined) ? data.debounceDelay : 30;
     factor = data.factor || 1;
-    scrollMeters = data.scrollMeters || 0;
-    measureType = data.measureType || "both";
+    useUnit = data.useUnit || 'meters'
+    measureType = data.measureType || 'both';
+    scrollDistance = data.scrollDistance || 0;
+
     if (ppi == 0) {
         alert('PPIが0に設定されています。再設定してください。')
         chrome.tabs.create({ url: "setting.html" });
     } else {
-        console.log(`Loaded settings: PPI=${ppi}, debounceDelay=${DD}, factor=${factor}, scrollMeters=${scrollMeters}`);
+        console.log(`Loaded settings: PPI=${ppi}, debounceDelay=${DD}, factor=${factor},useUnit=${useUnit},measureType=${measureType} scrollDistance=${scrollDistance}`);
     }
 }
 
 // スクロール距離の保存
-async function saveScrollMeters() {
+async function saveScrollDistance(scrollDistance) {
     if (!chrome.storage || !chrome.storage.local) { return false; }
     try {
-        await chrome.storage.local.set({ scrollMeters });
-        console.log(`Scroll distance saved: ${scrollMeters} meters`);
+        await chrome.storage.local.set({ scrollDistance });
+        // console.log(`Scroll distance saved: ${scrollDistance} Physics Pixels`);
     } catch (error) {
-        console.error('Failed to save scroll distance:', error);
+        console.log('Failed to save scroll distance: ', error);
     }
 }
 
@@ -62,13 +74,15 @@ async function updateScrollDistance() {
     } else {
         delta = (currentPosition - lastPosition) > 0 ? Math.abs(currentPosition - lastPosition) * factor : 0;
     }
-    scrollMeters += pixelsToMeters(delta);
+    // 保存は物理ピクセルで行う
+    scrollDistance += delta * window.devicePixelRatio;
     lastPosition = currentPosition;
 
-    await saveScrollMeters();
-    // popup.jsへ
+    await saveScrollDistance(scrollDistance);
+
+    // popup.jsへ送信
     if (!chrome.runtime || !chrome.runtime.sendMessage) { return false; }
-    chrome.runtime.sendMessage({ scrollMeters: scrollMeters })
+    chrome.runtime.sendMessage({ scrollDistance: scrollDistance })
         .catch(e => {
         });
     requestId = null;
@@ -102,7 +116,7 @@ function monitorUrlChanges() {
     };
     // URL変更の監視
     new MutationObserver(checkUrlChange).observe(document, { subtree: true, childList: true });
-    // SPAの対応
+    // SPAの対応...?
     window.addEventListener('popstate', checkUrlChange);
     const originalPushState = history.pushState;
     history.pushState = function (...args) {
@@ -112,6 +126,7 @@ function monitorUrlChanges() {
 }
 
 
+// 初期設定
 (async function () {
     console.log(`Device pixel ratio: ${window.devicePixelRatio}`);
     lastPosition = window.scrollY;
@@ -129,10 +144,14 @@ function monitorUrlChanges() {
             console.log(`receive info / ppi:${ppi},factor:${factor},DD:${DD}`)
         }
     });
+
     window.addEventListener('scroll', debounce(handleScroll, DD));
 
     monitorUrlChanges();
 
+    // devicePixelRatioの変更を検知..?
+    // いらなくないか...?
+    // ratioを変数にして、変更時のみ書き換えにすれば処理速度向上しそうですね
     let initialZoom = window.devicePixelRatio;
 
     window.addEventListener('resize', () => {
@@ -143,4 +162,8 @@ function monitorUrlChanges() {
     });
 
     // 高頻度で await loadSettings(); させるという手もあるけどまぁいいかなーって感じ
+    // -> URL変更検知時でいいのでは？
 })();
+
+
+// 保存は物理ピクセルにした

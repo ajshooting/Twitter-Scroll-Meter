@@ -68,6 +68,31 @@
             </select>
         </div>
         <div class="input-group">
+            <label for="useUnit">表示単位 :</label>
+            <select id="useUnit">
+                <option value="pixels">物理ピクセル [px]</option>
+                <option value="meters" selected>メートル [m]</option>
+                <option value="inch">インチ [in]</option>
+                <option value="feet">フィート [ft]</option>
+                <option value="yard">ヤード [yd]</option>
+                <option value="mile">マイル [mi]</option>
+                <option value="尺">尺 [尺]</option>
+                <option value="海里">海里 [海里]</option>
+                <option value="天文単位">天文単位 [au]</option>
+                <option value="光年">光年 [ly]</option>
+                <option value="parsec">パーセク [pc]</option>
+                <option value="angstrom">オングストローム [Å]</option>
+                <option value="fathom_e">ファゾム(英) [fathom]</option>
+                <option value="fathom_g">ファゾム(独) [fathom]</option>
+                <option value="fathom_w">ファゾム(維納) [fathom]</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="digit">表示桁数 :</label>
+            <input type="number" id="digit" placeholder="default: 2">
+            <button id="setDigit">設定する</button>
+        </div>
+        <div class="input-group">
             <label for="debounceDelay">更新頻度 :</label>
             <input type="number" id="debounceDelay" placeholder="default: 30">
             <button id="setDebounceDelay">設定する</button>

@@ -29,6 +29,21 @@ function setPPI() {
     }
 }
 
+function setDigit() {
+    const digit = parseInt(document.getElementById('digit').value);
+    if (digit >= 0) {
+        if (digit <= 45) {
+            chrome.storage.local.set({ digit: digit }, function () {
+                console.log(`digit set: ${digit}`);
+            });
+        } else {
+            alert("45より小さい値を設定して下さい")
+        }
+    } else {
+        alert("負の値は設定できません");
+    }
+}
+
 function setDD() {
     const DD = parseInt(document.getElementById('debounceDelay').value);
     if (DD >= 0) {
@@ -60,7 +75,7 @@ function setFactor() {
         // 情報送信
         sendInfo()
     } else {
-        alert("負の値は設定できません");
+        alert("0以下のの値は設定できません");
     }
 }
 
@@ -71,7 +86,7 @@ async function sendInfo() {
     const data = await chrome.storage.local.get(['devicePPI', 'debounceDelay', 'factor']);
     const ppi = data.devicePPI;
     const factor = data.factor || 1;
-    const DD = data.debounceDelay || 30;
+    const DD = (data.debounceDelay !== undefined) ? data.debounceDelay : 30;
 
     chrome.runtime.sendMessage({ devicePPI: ppi, factor: factor, debounceDelay: DD })
         .catch(e => {
@@ -80,28 +95,41 @@ async function sendInfo() {
 
 // 初期設定
 document.addEventListener('DOMContentLoaded', async function () {
-    const data = await chrome.storage.local.get(['devicePPI', 'debounceDelay', 'factor', 'measureType']);
-    const ppi = data.devicePPI;
+    const data = await chrome.storage.local.get(['devicePPI', 'debounceDelay', 'factor', 'measureType', 'useUnit', 'digit']);
+    const ppi = data.devicePPI || 96;
     const factor = data.factor || 1;
-    const DD = data.debounceDelay || 30;
+    const DD = (data.debounceDelay !== undefined) ? data.debounceDelay : 30;
     let measureType = data.measureType || "both";
+    let useUnit = data.useUnit || "meters";
+    let digit = (data.digit !== undefined) ? data.digit : 2;
 
     document.getElementById('factor').value = factor;
     document.getElementById('debounceDelay').value = DD;
     document.getElementById('measure_type').value = measureType;
+    document.getElementById('useUnit').value = useUnit;
+    document.getElementById('digit').value = digit;
     if (ppi) {
         document.getElementById('ppi-display').textContent = 'PPI: ' + ppi + ' に設定済み';
         document.getElementById('tateyoko').textContent = '縦:' + (pixelsToMeters(200, ppi) * 100 * factor).toFixed(2) + 'cm / 横:' + (pixelsToMeters(300, ppi) * 100 * factor).toFixed(2) + 'cm';
     }
 
     document.getElementById('calculatePPI').addEventListener('click', setPPI);
+    document.getElementById('setDigit').addEventListener('click', setDigit);
     document.getElementById('setDebounceDelay').addEventListener('click', setDD);
     document.getElementById('setFactor').addEventListener('click', setFactor);
 
     document.getElementById('measure_type').addEventListener('change', function () {
-        let measureType = this.value;
+        measureType = this.value;
         chrome.storage.local.set({ measureType: measureType }, function () {
+            alert(`measureTypeの設定が完了 : ${measureType} \n\n X/Twitterを再読み込みさせてください`);
             console.log(`measureType set: ${measureType}`);
+        });
+    });
+
+    document.getElementById('useUnit').addEventListener('change', function () {
+        useUnit = this.value;
+        chrome.storage.local.set({ useUnit: useUnit }, function () {
+            console.log(`useUnit set: ${useUnit}`);
         });
     });
 

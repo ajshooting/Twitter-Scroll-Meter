@@ -8,3 +8,15 @@ async function loadData() {
 }
 
 loadData();
+
+
+// ここも更新させる
+// chrome.runtime.onInstalled.addListener((details) => {
+//     if (details.reason === chrome.runtime.OnInstalledReason.UPDATE) {
+//         console.log('Extension updated');
+//         // 更新時に実行したい処理をここに記述
+//     } else if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {
+//         console.log('Extension installed');
+//         // インストール時に実行したい処理をここに記述
+//     }
+// });
