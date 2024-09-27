@@ -3,14 +3,10 @@
 // ->history
 // ひゅんって戻った時のために閾値で(設定可能にする？)
 // 再読み込み(というかトップに戻るの)検知してURL遷移時と同じような処理(いろんなところにクリックイベントリスナーかな)
-// settingsからcontentにsendする->なくす？
-// -> 送れるだけ送ろうかなとか
 // PPI だけ は別ページで設定させるようにする？
 
-// やったことメモ
-// 接続解除時にExtension context invalidated.のやつ
-// 
-
+// settingから送信できるようにした
+// 再読み込みの必要なしに
 
 let requestId = null;
 let suggestReload = false;
@@ -55,7 +51,7 @@ async function loadSettings() {
         alert('PPIが0に設定されています。再設定してください。')
         chrome.tabs.create({ url: "setting.html" });
     } else {
-        console.log(`Loaded settings: PPI=${ppi}, debounceDelay=${DD}, factor=${factor},useUnit=${useUnit},measureType=${measureType} scrollDistance=${scrollDistance}`);
+        console.log(`[twitter scroll meter]\nLoaded settings: PPI=${ppi}, debounceDelay=${DD}, factor=${factor},useUnit=${useUnit},measureType=${measureType} scrollDistance=${scrollDistance}`);
     }
 }
 
@@ -74,7 +70,6 @@ async function saveScrollDistance(scrollDistance) {
 // スクロール距離の更新
 async function updateScrollDistance() {
     // 接続の解除を検知->リロード
-    console.log(chrome.runtime.id)
     if (chrome.runtime.id == undefined) {
         if (suggestReload == false) {
             alert("拡張機能[Twitter Scroll Meter]が更新されました\nTwitter/Xを再読み込みするまで計測は中断されます。");
@@ -94,7 +89,7 @@ async function updateScrollDistance() {
     } else {
         delta = (currentPosition - lastPosition) > 0 ? Math.abs(currentPosition - lastPosition) * factor : 0;
     }
-    // 保存は物理ピクセルで行う
+    // 保存は物理ピクセルで
     scrollDistance += delta * ratio;
     lastPosition = currentPosition;
 
@@ -184,18 +179,15 @@ const updatePixelRatio = () => {
     // Ratio変更時の処理
     updatePixelRatio();
 
-
-
     // setting.jsからの情報を受信する
-    // うごかない
-    // Reload指示のみでOKでは？
     chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-        if (request.devicePPI !== undefined) {
-            ppi = request.devicePPI;
-            factor = request.factor;
-            DD = request.debounceDelay;
-            console.log(`receive info / ppi:${ppi},factor:${factor},DD:${DD}`)
-        }
+        ppi = request.devicePPI;
+        factor = request.factor;
+        DD = request.debounceDelay;
+        measureType = request.measureType;
+        console.log(`receive info / ppi:${ppi},factor:${factor},DD:${DD},measureType:${measureType}`)
+        sendResponse();
+        return;
     });
 
 

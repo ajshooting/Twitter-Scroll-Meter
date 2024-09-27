@@ -21,5 +21,6 @@ chrome.runtime.onInstalled.addListener((details) => {
     } else if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {
         console.log('Extension installed');
         // ここは上の処理と同じだもんなぁ..
+        //
     }
 });

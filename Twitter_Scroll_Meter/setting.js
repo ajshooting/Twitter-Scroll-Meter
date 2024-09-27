@@ -48,7 +48,7 @@ function setDD() {
     const DD = parseInt(document.getElementById('debounceDelay').value);
     if (DD >= 0) {
         chrome.storage.local.set({ debounceDelay: DD }, function () {
-            alert(`debounceDelayの設定が完了 : ${DD} \n\n X/Twitterを再読み込みさせてください`);
+            // alert(`debounceDelayの設定が完了 : ${DD} \n\n X/Twitterを再読み込みさせてください`);
             console.log(`debounceDelay set: ${DD}`);
         });
         // 情報送信
@@ -62,7 +62,7 @@ function setFactor() {
     const factor = parseFloat(document.getElementById('factor').value);
     if (factor > 0) {
         chrome.storage.local.set({ factor: factor }, function () {
-            alert(`Factorの設定が完了 : ${factor} \n\n X/Twitterを再読み込みさせてください`);
+            // alert(`Factorの設定が完了 : ${factor} \n\n X/Twitterを再読み込みさせてください`);
             console.log(`Factor set: ${factor}`);
         });
         // 縦横の変更
@@ -80,17 +80,19 @@ function setFactor() {
 }
 
 // 設定した情報を送信する
-// < う ご か な い >
-// というより新タブで開いてる時もあるんだし動かなくて当然では？
 async function sendInfo() {
-    const data = await chrome.storage.local.get(['devicePPI', 'debounceDelay', 'factor']);
+    const data = await chrome.storage.local.get(['devicePPI', 'debounceDelay', 'factor', 'measureType']);
     const ppi = data.devicePPI;
     const factor = data.factor || 1;
     const DD = (data.debounceDelay !== undefined) ? data.debounceDelay : 30;
+    const measureType = data.measureType || "both";
 
-    chrome.runtime.sendMessage({ devicePPI: ppi, factor: factor, debounceDelay: DD })
-        .catch(e => {
-        });
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, { devicePPI: ppi, factor: factor, debounceDelay: DD, measureType: measureType })
+            .catch(e => {
+                // alert(e)
+            });
+    });
 }
 
 // 初期設定
@@ -121,8 +123,10 @@ document.addEventListener('DOMContentLoaded', async function () {
     document.getElementById('measure_type').addEventListener('change', function () {
         measureType = this.value;
         chrome.storage.local.set({ measureType: measureType }, function () {
-            alert(`measureTypeの設定が完了 : ${measureType} \n\n X/Twitterを再読み込みさせてください`);
+            // alert(`measureTypeの設定が完了 : ${measureType} \n\n X/Twitterを再読み込みさせてください`);
             console.log(`measureType set: ${measureType}`);
+            // 情報送信
+            sendInfo()
         });
     });
 

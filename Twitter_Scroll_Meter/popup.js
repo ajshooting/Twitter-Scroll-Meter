@@ -68,5 +68,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         if (request.scrollDistance !== undefined) {
             updateDisplay(convertUnit(request.scrollDistance, useUnit, ppi), unit, digit);
         }
+        sendResponse();
+        return;
     });
 });
