@@ -1,20 +1,27 @@
 // やることメモ
 // 
 // ->history
-// 0保存回避
-// ひゅんって戻った時のために閾値で
-// 再読み込み検知してURL遷移時と同じような処理
-// settingsからcontentにsendする
-// PPI は別ページで設定させるようにする！
+// ひゅんって戻った時のために閾値で(設定可能にする？)
+// 再読み込み(というかトップに戻るの)検知してURL遷移時と同じような処理(いろんなところにクリックイベントリスナーかな)
+// settingsからcontentにsendする->なくす？
+// -> 送れるだけ送ろうかなとか
+// PPI だけ は別ページで設定させるようにする？
+
+// やったことメモ
+// 接続解除時にExtension context invalidated.のやつ
+// 
+
 
 let requestId = null;
+let suggestReload = false;
 let ppi = 96;
 let DD = 30;
 let factor = 1;
 let scrollDistance = 0;
-let useUnit = "meters"
-let measureType = "both"
+let useUnit = "meters";
+let measureType = "both";
 let lastPosition = 0;
+let ratio = 1;
 
 function debounce(func, delay) {
     let timeoutId;
@@ -55,6 +62,7 @@ async function loadSettings() {
 // スクロール距離の保存
 async function saveScrollDistance(scrollDistance) {
     if (!chrome.storage || !chrome.storage.local) { return false; }
+    if (scrollDistance == 0) { return false; }
     try {
         await chrome.storage.local.set({ scrollDistance });
         // console.log(`Scroll distance saved: ${scrollDistance} Physics Pixels`);
@@ -65,8 +73,20 @@ async function saveScrollDistance(scrollDistance) {
 
 // スクロール距離の更新
 async function updateScrollDistance() {
+    // 接続の解除を検知->リロード
+    console.log(chrome.runtime.id)
+    if (chrome.runtime.id == undefined) {
+        if (suggestReload == false) {
+            alert("拡張機能[Twitter Scroll Meter]が更新されました\nTwitter/Xを再読み込みするまで計測は中断されます。");
+            suggestReload = true;
+        }
+        requestId = null;
+        return;
+    };
+
     const currentPosition = window.scrollY;
     let delta;
+    // 閾値の処理入れますか〜？
     if (measureType == "both") {
         delta = Math.abs(currentPosition - lastPosition) * factor;
     } else if (measureType == "upOnly") {
@@ -75,7 +95,7 @@ async function updateScrollDistance() {
         delta = (currentPosition - lastPosition) > 0 ? Math.abs(currentPosition - lastPosition) * factor : 0;
     }
     // 保存は物理ピクセルで行う
-    scrollDistance += delta * window.devicePixelRatio;
+    scrollDistance += delta * ratio;
     lastPosition = currentPosition;
 
     await saveScrollDistance(scrollDistance);
@@ -109,7 +129,9 @@ function monitorUrlChanges() {
             // これ挟まないとwindow.scrollYが173.88くらいに固定されちゃう
             setTimeout(() => {
                 lastPosition = window.scrollY;
-                console.log(`遷移後位置: ${lastPosition}`);
+                // console.log(`遷移後位置: ${lastPosition}`);
+                // URL変更時に再提案
+                suggestReload = false;
             }, 0);
         };
         waitForPageLoad();
@@ -125,13 +147,44 @@ function monitorUrlChanges() {
     };
 }
 
+// devicePixelRatioの変更を検知
+ratio = window.devicePixelRatio;
+let remove = null;
+const updatePixelRatio = () => {
+    if (remove != null) {
+        remove();
+    }
+    ratio = window.devicePixelRatio;
+    // console.log(`updateRatio : ${ratio}`)
+    const mqString = `(resolution: ${ratio}dppx)`;
+    const media = matchMedia(mqString);
+    media.addEventListener("change", updatePixelRatio);
+    remove = () => {
+        media.removeEventListener("change", updatePixelRatio);
+    };
+};
 
-// 初期設定
+
+// ここが実行！
 (async function () {
-    console.log(`Device pixel ratio: ${window.devicePixelRatio}`);
     lastPosition = window.scrollY;
 
+    // 接続できたフラグ(popup用)
+    chrome.storage.local.set({ disconnected: false });
+
+    // 設定読み込み
     await loadSettings();
+
+    // メイン処理
+    window.addEventListener('scroll', debounce(handleScroll, DD));
+
+    // URL変更時の処理
+    monitorUrlChanges();
+
+    // Ratio変更時の処理
+    updatePixelRatio();
+
+
 
     // setting.jsからの情報を受信する
     // うごかない
@@ -145,25 +198,8 @@ function monitorUrlChanges() {
         }
     });
 
-    window.addEventListener('scroll', debounce(handleScroll, DD));
 
-    monitorUrlChanges();
-
-    // devicePixelRatioの変更を検知..?
-    // いらなくないか...?
-    // ratioを変数にして、変更時のみ書き換えにすれば処理速度向上しそうですね
-    let initialZoom = window.devicePixelRatio;
-
-    window.addEventListener('resize', () => {
-        if (window.devicePixelRatio !== initialZoom) {
-            console.log('Zoom level changed');
-            initialZoom = window.devicePixelRatio;
-        }
-    });
 
     // 高頻度で await loadSettings(); させるという手もあるけどまぁいいかなーって感じ
     // -> URL変更検知時でいいのでは？
 })();
-
-
-// 保存は物理ピクセルにした

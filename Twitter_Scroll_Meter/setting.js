@@ -4,7 +4,7 @@ function pixelsToMeters(pixels, ppi) {
     return meters;
 }
 
-// PPIを計算し、表示する関数
+// PPIを計算し、表示する
 function setPPI() {
     const screenSize = parseFloat(document.getElementById('screen-size').value);
     const screenWidth = parseInt(document.getElementById('screen-width').value);
