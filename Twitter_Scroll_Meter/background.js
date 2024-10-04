@@ -4,7 +4,7 @@ async function loadData() {
     let ppi = data.devicePPI || null;
     if (!ppi || ppi == 0) {
         // ここをPPI設定画面に変更したいわけですね
-        chrome.tabs.create({ url: "setting.html" });
+        chrome.tabs.create({ url: "setPPI.html" });
     }
 }
 

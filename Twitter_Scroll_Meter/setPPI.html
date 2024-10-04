@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Test</title>
+    <meta charset="UTF-8">
+    <style>
+        h2 {
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+
+        #ppi-display {
+            margin-top: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        #rectangle {
+            width: 300px;
+            height: 200px;
+            background-color: lightblue;
+            margin-top: 10px;
+            border: 1px solid black;
+        }
+
+        .input-group {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>正確に測定するために設定してください</h2>
+
+    <div class="input-group">
+        <label for="screen-size">画面サイズ(inch):</label>
+        <input type="number" id="screen-size" placeholder="ex: 15.6" step="0.1">
+    </div>
+
+    <div class="input-group">
+        <label for="screen-width">解像度(横):</label>
+        <input type="number" id="screen-width" placeholder="ex: 1920">
+    </div>
+
+    <div class="input-group">
+        <label for="screen-height">解像度(縦):</label>
+        <input type="number" id="screen-height" placeholder="ex: 1080">
+    </div>
+
+    <button id="calculatePPI">PPIを計算・設定する</button>
+    <div id="ppi-display">PPI: 未設定</div>
+
+    <!-- 300x200の四角形 -->
+    <div id="rectangle"></div>
+    <div id="tateyoko"></div>
+    <div>(違うなら下の補正係数をいじってください)</div>
+
+    <div class="input-group">
+        <label for="factor">補正係数 :</label>
+        <input type="number" id="factor" placeholder="default: 1">
+        <button id="setFactor">設定する</button>
+    </div>
+    <div>(自分が確認したRetinaﾃﾞｨｽﾌﾟﾚｲだと0.885がおすすめ)</div>
+
+    <br>
+
+    <h3>このページで設定が終わった後、Twitter/Xを必ず再読み込みさせてください。</h3>
+
+    <!-- <br> -->
+    <!-- <button id="newtab">newtabで開く</button> -->
+    <script src="setPPI.js"></script>
+</body>
+
+</html>

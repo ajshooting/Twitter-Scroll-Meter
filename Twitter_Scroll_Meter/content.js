@@ -3,10 +3,7 @@
 // ->history
 // ひゅんって戻った時のために閾値で(設定可能にする？)
 // 再読み込み(というかトップに戻るの)検知してURL遷移時と同じような処理(いろんなところにクリックイベントリスナーかな)
-// PPI だけ は別ページで設定させるようにする？
 
-// settingから送信できるようにした
-// 再読み込みの必要なしに
 
 let requestId = null;
 let suggestReload = false;
@@ -30,12 +27,6 @@ function debounce(func, delay) {
         }, delay);
     };
 }
-
-// CSSピクセルを物理ピクセルにしてからメートルに変換する
-// function pixelsToMeters(pixels) {
-//     const inches = (pixels * window.devicePixelRatio) / ppi;
-//     return inches * 0.0254;
-// }
 
 // 読み込む
 async function loadSettings() {
@@ -70,6 +61,7 @@ async function saveScrollDistance(scrollDistance) {
 // スクロール距離の更新
 async function updateScrollDistance() {
     // 接続の解除を検知->リロード
+    // ここIDが読み取れない場合あるっぽいからchrome.runtime==undefinedで十分かどうかの検証ができたらそっちでやりましょ
     if (chrome.runtime.id == undefined) {
         if (suggestReload == false) {
             alert("拡張機能[Twitter Scroll Meter]が更新されました\nTwitter/Xを再読み込みするまで計測は中断されます。");
@@ -189,9 +181,4 @@ const updatePixelRatio = () => {
         sendResponse();
         return;
     });
-
-
-
-    // 高頻度で await loadSettings(); させるという手もあるけどまぁいいかなーって感じ
-    // -> URL変更検知時でいいのでは？
 })();

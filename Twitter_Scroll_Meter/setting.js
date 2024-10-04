@@ -4,31 +4,6 @@ function pixelsToMeters(pixels, ppi) {
     return meters;
 }
 
-// PPIを計算し、表示する
-function setPPI() {
-    const screenSize = parseFloat(document.getElementById('screen-size').value);
-    const screenWidth = parseInt(document.getElementById('screen-width').value);
-    const screenHeight = parseInt(document.getElementById('screen-height').value);
-    const screenDiagonalPixels = Math.sqrt(screenWidth ** 2 + screenHeight ** 2);
-    const ppi = (screenDiagonalPixels / screenSize).toFixed(1);
-    if (screenSize > 0 && screenWidth > 0 && ppi > 0) {
-        chrome.storage.local.set({ devicePPI: ppi }, function () {
-            document.getElementById('ppi-display').textContent = 'PPI: ' + ppi + ' に設定完了';
-            alert(`PPIの設定が完了 : ${ppi} \n\n X/Twitterを再読み込みさせてください`);
-            console.log(`PPI saved: ${ppi}`);
-        });
-        // 縦横の変更
-        chrome.storage.local.get(['factor'], function (data) {
-            const factor = data.factor || 1;
-            document.getElementById('tateyoko').textContent = '縦:' + (pixelsToMeters(200, ppi) * 100 * factor).toFixed(2) + 'cm / 横:' + (pixelsToMeters(300, ppi) * 100 * factor).toFixed(2) + 'cm';
-        });
-        // 情報送信
-        sendInfo()
-    } else {
-        document.getElementById('ppi-display').textContent = '正しい値を入力してください。';
-    }
-}
-
 function setDigit() {
     const digit = parseInt(document.getElementById('digit').value);
     if (digit >= 0) {
@@ -115,7 +90,6 @@ document.addEventListener('DOMContentLoaded', async function () {
         document.getElementById('tateyoko').textContent = '縦:' + (pixelsToMeters(200, ppi) * 100 * factor).toFixed(2) + 'cm / 横:' + (pixelsToMeters(300, ppi) * 100 * factor).toFixed(2) + 'cm';
     }
 
-    document.getElementById('calculatePPI').addEventListener('click', setPPI);
     document.getElementById('setDigit').addEventListener('click', setDigit);
     document.getElementById('setDebounceDelay').addEventListener('click', setDD);
     document.getElementById('setFactor').addEventListener('click', setFactor);
@@ -135,6 +109,10 @@ document.addEventListener('DOMContentLoaded', async function () {
         chrome.storage.local.set({ useUnit: useUnit }, function () {
             console.log(`useUnit set: ${useUnit}`);
         });
+    });
+
+    document.getElementById('setPPI').addEventListener('click', function () {
+        chrome.tabs.create({ url: "setPPI.html" });
     });
 
     // debug用
