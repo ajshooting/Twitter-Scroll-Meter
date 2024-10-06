@@ -1,3 +1,7 @@
+// 取得するようにしてもいいかもー
+const boxWidth = 600;
+const boxHeight = 400;
+
 function pixelsToMeters(pixels, ppi) {
     const inches = (pixels * window.devicePixelRatio) / ppi;
     const meters = inches * 0.0254;
@@ -20,7 +24,7 @@ function setPPI() {
         // 縦横の変更
         chrome.storage.local.get(['factor'], function (data) {
             const factor = data.factor || 1;
-            document.getElementById('tateyoko').textContent = '縦:' + (pixelsToMeters(200, ppi) * 100 * factor).toFixed(2) + 'cm / 横:' + (pixelsToMeters(300, ppi) * 100 * factor).toFixed(2) + 'cm';
+            document.getElementById('tateyoko').textContent = '縦:' + (pixelsToMeters(boxHeight, ppi) * 100 * factor).toFixed(2) + 'cm / 横:' + (pixelsToMeters(boxWidth, ppi) * 100 * factor).toFixed(2) + 'cm';
         });
         // 情報送信
         sendInfo()
@@ -40,7 +44,7 @@ function setFactor() {
         chrome.storage.local.get(['devicePPI'], function (data) {
             const ppi = data.devicePPI;
             if (ppi) {
-                document.getElementById('tateyoko').textContent = '縦:' + (pixelsToMeters(200, ppi) * 100 * factor).toFixed(2) + 'cm / 横:' + (pixelsToMeters(300, ppi) * 100 * factor).toFixed(2) + 'cm';
+                document.getElementById('tateyoko').textContent = '縦:' + (pixelsToMeters(boxHeight, ppi) * 100 * factor).toFixed(2) + 'cm / 横:' + (pixelsToMeters(boxWidth, ppi) * 100 * factor).toFixed(2) + 'cm';
             }
         });
         // 情報送信(できません)
@@ -60,7 +64,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     document.getElementById('factor').value = factor;
     if (ppi) {
         document.getElementById('ppi-display').textContent = 'PPI: ' + ppi + ' に設定済み';
-        document.getElementById('tateyoko').textContent = '縦:' + (pixelsToMeters(200, ppi) * 100 * factor).toFixed(2) + 'cm / 横:' + (pixelsToMeters(300, ppi) * 100 * factor).toFixed(2) + 'cm';
+        document.getElementById('tateyoko').textContent = '縦:' + (pixelsToMeters(boxHeight, ppi) * 100 * factor).toFixed(2) + 'cm / 横:' + (pixelsToMeters(boxWidth, ppi) * 100 * factor).toFixed(2) + 'cm';
     }
 
     document.getElementById('calculatePPI').addEventListener('click', setPPI);
