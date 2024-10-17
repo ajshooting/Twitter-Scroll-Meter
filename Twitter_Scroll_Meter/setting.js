@@ -7,13 +7,9 @@ function pixelsToMeters(pixels, ppi) {
 function setDigit() {
     const digit = parseInt(document.getElementById('digit').value);
     if (digit >= 0) {
-        if (digit <= 45) {
-            chrome.storage.local.set({ digit: digit }, function () {
-                console.log(`digit set: ${digit}`);
-            });
-        } else {
-            alert("45より小さい値を設定して下さい")
-        }
+        chrome.storage.local.set({ digit: digit }, function () {
+            console.log(`digit set: ${digit}`);
+        });
     } else {
         alert("負の値は設定できません");
     }
