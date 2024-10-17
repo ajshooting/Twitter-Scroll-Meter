@@ -179,6 +179,7 @@ const updatePixelRatio = () => {
         factor = request.factor;
         DD = request.debounceDelay;
         measureType = request.measureType;
+        threshold = request.threshold;
         console.log(`receive info / ppi:${ppi},factor:${factor},DD:${DD},measureType:${measureType}`)
         sendResponse();
         return;

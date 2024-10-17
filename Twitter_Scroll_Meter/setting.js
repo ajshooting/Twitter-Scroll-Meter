@@ -63,14 +63,15 @@ function setFactor() {
 
 // 設定した情報を送信する
 async function sendInfo() {
-    const data = await chrome.storage.local.get(['devicePPI', 'debounceDelay', 'factor', 'measureType']);
+    const data = await chrome.storage.local.get(['devicePPI', 'debounceDelay', 'factor', 'measureType', 'threshold']);
     const ppi = data.devicePPI;
     const factor = data.factor || 1;
     const DD = (data.debounceDelay !== undefined) ? data.debounceDelay : 30;
     const measureType = data.measureType || "both";
+    const threshold = data.threshold || 10000;
 
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, { devicePPI: ppi, factor: factor, debounceDelay: DD, measureType: measureType })
+        chrome.tabs.sendMessage(tabs[0].id, { devicePPI: ppi, factor: factor, debounceDelay: DD, measureType: measureType, threshold: threshold })
             .catch(e => {
                 // alert(e)
             });
