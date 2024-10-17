@@ -19,6 +19,17 @@ function setDigit() {
     }
 }
 
+function setThreshold() {
+    const threshold = parseInt(document.getElementById('threshold').value);
+    if (threshold >= 0) {
+        chrome.storage.local.set({ threshold: threshold }, function () {
+            console.log(`threshold set: ${threshold}`);
+        });
+    } else {
+        alert("負の値は設定できません");
+    }
+}
+
 function setDD() {
     const DD = parseInt(document.getElementById('debounceDelay').value);
     if (DD >= 0) {
@@ -72,16 +83,18 @@ async function sendInfo() {
 
 // 初期設定
 document.addEventListener('DOMContentLoaded', async function () {
-    const data = await chrome.storage.local.get(['devicePPI', 'debounceDelay', 'factor', 'measureType', 'useUnit', 'digit']);
+    const data = await chrome.storage.local.get(['devicePPI', 'debounceDelay', 'factor', 'measureType', 'useUnit', 'digit', 'threshold']);
     const ppi = data.devicePPI || 96;
     const factor = data.factor || 1;
     const DD = (data.debounceDelay !== undefined) ? data.debounceDelay : 30;
+    const threshold = data.threshold || 10000;
     let measureType = data.measureType || "both";
     let useUnit = data.useUnit || "meters";
     let digit = (data.digit !== undefined) ? data.digit : 2;
 
     document.getElementById('factor').value = factor;
     document.getElementById('debounceDelay').value = DD;
+    document.getElementById('threshold').value = threshold;
     document.getElementById('measure_type').value = measureType;
     document.getElementById('useUnit').value = useUnit;
     document.getElementById('digit').value = digit;
@@ -91,6 +104,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
     document.getElementById('setDigit').addEventListener('click', setDigit);
+    document.getElementById('setThreshold').addEventListener('click', setThreshold);
     document.getElementById('setDebounceDelay').addEventListener('click', setDD);
     document.getElementById('setFactor').addEventListener('click', setFactor);
 

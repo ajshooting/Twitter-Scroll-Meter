@@ -31,6 +31,35 @@
         .input-group {
             margin-bottom: 5px;
         }
+
+        /* ツールチップのスタイル */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 150px;
+            background-color: black;
+            color: #fff;
+            text-align: center;
+            border-radius: 5px;
+            padding: 5px 0;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -30px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
     </style>
 </head>
 
@@ -50,7 +79,10 @@
 
     <h3>高度な設定</h3>
     <div class="input-group">
-        <label for="measure_type">計測タイミング :</label>
+        <div class="tooltip">
+            <label for="measure_type">計測タイミング :</label>
+            <span class="tooltiptext">計測するスクロール</span>
+        </div>
         <select id="measure_type">
             <option value="both" selected>全てのスクロール</option>
             <option value="downOnly">下スクロールのみ</option>
@@ -58,7 +90,11 @@
         </select>
     </div>
     <div class="input-group">
-        <label for="useUnit">表示単位 :</label>
+        <div class="tooltip">
+            <label for="useUnit">表示単位 :</label>
+            <span class="tooltiptext">計測した値を表示する単位</span>
+        </div>
+
         <select id="useUnit">
             <option value="pixels">物理ピクセル [px]</option>
             <option value="meters" selected>メートル [m]</option>
@@ -78,17 +114,34 @@
         </select>
     </div>
     <div class="input-group">
-        <label for="digit">表示桁数 :</label>
+        <div class="tooltip">
+            <label for="digit">表示桁数 :</label>
+            <span class="tooltiptext">表示する桁数(小数点以下)</span>
+        </div>
         <input type="number" id="digit" placeholder="default: 2">
         <button id="setDigit">設定する</button>
     </div>
     <div class="input-group">
-        <label for="debounceDelay">更新頻度 :</label>
+        <div class="tooltip">
+            <label for="threshold">閾値[px] :</label>
+            <span class="tooltiptext">一回の更新の最大値</span>
+        </div>
+        <input type="number" id="threshold" placeholder="default: ?">
+        <button id="setThreshold">設定する</button>
+    </div>
+    <div class="input-group">
+        <div class="tooltip">
+            <label for="debounceDelay">更新頻度 :</label>
+            <span class="tooltiptext">計測間隔の最小値[ms]</span>
+        </div>
         <input type="number" id="debounceDelay" placeholder="default: 30">
         <button id="setDebounceDelay">設定する</button>
     </div>
     <div class="input-group">
-        <label for="factor">補正係数 :</label>
+        <div class="tooltip">
+            <label for="factor">補正係数 :</label>
+            <span class="tooltiptext">結果をn倍。補正用</span>
+        </div>
         <input type="number" id="factor" placeholder="default: 1">
         <button id="setFactor">設定する</button>
     </div>

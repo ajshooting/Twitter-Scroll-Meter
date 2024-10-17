@@ -15,6 +15,7 @@ let useUnit = "meters";
 let measureType = "both";
 let lastPosition = 0;
 let ratio = 1;
+let threshold = 10000;
 
 function debounce(func, delay) {
     let timeoutId;
@@ -30,19 +31,20 @@ function debounce(func, delay) {
 
 // 読み込む
 async function loadSettings() {
-    const data = await chrome.storage.local.get(['devicePPI', 'debounceDelay', 'factor', 'scrollDistance', 'measureType', 'useUnit']);
+    const data = await chrome.storage.local.get(['devicePPI', 'debounceDelay', 'factor', 'scrollDistance', 'measureType', 'useUnit', 'threshold']);
     ppi = data.devicePPI || 96;
     DD = (data.debounceDelay !== undefined) ? data.debounceDelay : 30;
     factor = data.factor || 1;
     useUnit = data.useUnit || 'meters'
     measureType = data.measureType || 'both';
     scrollDistance = data.scrollDistance || 0;
+    threshold = data.threshold || 10000;
 
     if (ppi == 0) {
         alert('PPIが0に設定されています。再設定してください。')
         chrome.tabs.create({ url: "setting.html" });
     } else {
-        console.log(`[twitter scroll meter]\nLoaded settings: PPI=${ppi}, debounceDelay=${DD}, factor=${factor},useUnit=${useUnit},measureType=${measureType} scrollDistance=${scrollDistance}`);
+        console.log(`[twitter scroll meter]\nLoaded settings: PPI=${ppi},debounceDelay=${DD},factor=${factor},useUnit=${useUnit},measureType=${measureType},threshold=${threshold},scrollDistance=${scrollDistance}`);
     }
 }
 
@@ -73,13 +75,16 @@ async function updateScrollDistance() {
 
     const currentPosition = window.scrollY;
     let delta;
-    // 閾値の処理入れますか〜？
+    const abs = Math.abs(currentPosition - lastPosition);
+
+    if (abs > threshold) return;
+
     if (measureType == "both") {
-        delta = Math.abs(currentPosition - lastPosition) * factor;
+        delta = abs * factor;
     } else if (measureType == "upOnly") {
-        delta = (currentPosition - lastPosition) < 0 ? Math.abs(currentPosition - lastPosition) * factor : 0;
+        delta = (currentPosition - lastPosition) < 0 ? abs * factor : 0;
     } else {
-        delta = (currentPosition - lastPosition) > 0 ? Math.abs(currentPosition - lastPosition) * factor : 0;
+        delta = (currentPosition - lastPosition) > 0 ? abs * factor : 0;
     }
     // 保存は物理ピクセルで
     scrollDistance += delta * ratio;
