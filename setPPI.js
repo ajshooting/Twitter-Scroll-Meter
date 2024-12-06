@@ -27,7 +27,7 @@ function setPPI() {
             document.getElementById('tateyoko').textContent = '縦:' + (pixelsToMeters(boxHeight, ppi) * 100 * factor).toFixed(2) + 'cm / 横:' + (pixelsToMeters(boxWidth, ppi) * 100 * factor).toFixed(2) + 'cm';
         });
         // 情報送信
-        sendInfo()
+        // sendInfo()
     } else {
         document.getElementById('ppi-display').textContent = '正しい値を入力してください。';
     }
